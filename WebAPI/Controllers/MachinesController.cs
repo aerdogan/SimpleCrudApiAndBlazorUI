@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.DataAccess;
 using WebAPI.Helpers;
@@ -16,6 +17,7 @@ namespace WebAPI.Controllers
             _db = db;
         }
 
+        [Authorize]
         [HttpPost("MachineAdd")]
         public IActionResult MachineAdd(MachineDTO machineDTO)
         {
@@ -26,6 +28,7 @@ namespace WebAPI.Controllers
             else return BadRequest("Hata");
         }
 
+        [Authorize]
         [HttpPatch("MachineUpdate")]
         public IActionResult MachineUpdate(Machine machine_)
         {
@@ -41,6 +44,7 @@ namespace WebAPI.Controllers
 
         public record DeleteDTO(int Id);
 
+        [Authorize]
         [HttpDelete("MachineDelete")]
         public IActionResult MachineDelete([FromBody] DeleteDTO delete)
         {
@@ -51,6 +55,7 @@ namespace WebAPI.Controllers
             else return BadRequest("Hata");
         }
 
+        [Authorize]
         [HttpGet("MachineList")]
         public IActionResult MachineList()
         {

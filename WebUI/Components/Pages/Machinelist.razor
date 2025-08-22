@@ -1,0 +1,55 @@
+﻿@page "/machinelist"
+@attribute [StreamRendering]
+@using WebUI.Models
+@using WebUI.Resources
+
+@inject HttpClient Http
+
+
+<h3>machinelist</h3>
+
+@if (machines == null)
+{
+    <p><em>@Consts.LOADING</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>CODE</th>
+                <th>MODEL</th>
+                <th>MACHINE_TYPE</th>
+                <th>MACHINE_GROUP</th>
+                <th>LOCATION</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var machine in machines)
+            {
+                <tr>
+                    <td>@machine.CODE</td>
+                    <td>@machine.MODEL</td>
+                    <td>@machine.MACHINE_TYPE</td>
+                    <td>@machine.MACHINE_GROUP</td>
+                    <td>@machine.LOCATION</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button type="button" class="btn btn-success">@Consts.ADD_NEW_MACHINE</button>
+}
+
+@code {
+
+    private Machine[]? machines;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(500);
+
+        machines = await Http.GetFromJsonAsync<Machine[]>($"{ Consts.API_URL }Machines/MachineList");
+    }
+
+}
