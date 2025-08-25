@@ -4,7 +4,7 @@
 @using WebUI.Resources
 
 @inject HttpClient Http
-
+@inject IJSRuntime JSRuntime
 
 <h3>machinelist</h3>
 
@@ -38,18 +38,106 @@ else
         </tbody>
     </table>
 
-    <button type="button" class="btn btn-success">@Consts.ADD_NEW_MACHINE</button>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#apiModal">
+        @Consts.ADD_NEW_MACHINE
+    </button>
+
+
+    <div class="modal fade" id="apiModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">API İçin Form</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <EditForm Model="@formModel" OnValidSubmit="@HandleValidSubmit">
+                    <DataAnnotationsValidator />
+                    <div class="modal-body">
+
+                        <div class="mb-3">
+                            <label class="form-label">Code</label>
+                            <InputText class="form-control" @bind-Value="formModel.code" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Model</label>
+                            <InputText class="form-control" @bind-Value="formModel.model" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Machine Type</label>
+                            <InputText class="form-control" @bind-Value="formModel.machinE_TYPE" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Machine Group</label>
+                            <InputText class="form-control" @bind-Value="formModel.machinE_GROUP" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Location</label>
+                            <InputText class="form-control" @bind-Value="formModel.location" />
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                    </div>
+                </EditForm>
+
+            </div>
+        </div>
+    </div>
+
 }
 
 @code {
 
     private Machine[]? machines;
 
+    // Listele
     protected override async Task OnInitializedAsync()
     {
         await Task.Delay(500);
 
         machines = await Http.GetFromJsonAsync<Machine[]>($"{ Consts.API_URL }Machines/MachineList");
     }
+
+
+
+    // Ekleme Formu
+    private MachineFormModel formModel = new();
+
+    private async Task HandleValidSubmit()
+    {
+        var response = await Http.PostAsJsonAsync($"{Consts.API_URL}Machines/MachineAdd", formModel);
+
+        if (response.IsSuccessStatusCode)
+        {
+            // Başarılıysa modal'ı kapat
+            // await JSRuntime.InvokeVoidAsync("bootstrap.Modal.getInstance",
+            //      await JSRuntime.InvokeAsync<ElementReference>("document.getElementById", "apiModal"));
+        }
+        else
+        {
+            // hata yönetimi
+            Console.WriteLine("API Hatası: " + response.StatusCode);
+        }
+    }
+
+    public class MachineFormModel
+    {
+        public string code { get; set; }
+        public string model { get; set; }
+        public string machinE_TYPE { get; set; }
+        public string machinE_GROUP { get; set; }
+        public string location { get; set; }
+    }
+
+
 
 }
